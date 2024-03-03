@@ -1,0 +1,73 @@
+class Queue:
+    def __init__(self):
+        self.data = []
+
+    def is_empty(self) -> bool:
+        return len(self.data) == 0
+
+    def front(self):
+        if self.is_empty():
+            return None
+        return self.data[0]
+
+    def enqueue(self, item):
+        self.data.append(item)
+
+    def dequeue(self):
+        k = self.front()
+        self.data = self.data[1:]
+        return k
+
+def main():
+    graph = {
+        "a": ["b"],
+        "b": ["c", "d"],
+        "c": ["e", "b"],
+        "d": ["f", "e", "b"],
+        "e": ["c", "d"],
+        "f": ["d"]
+    }
+
+    start = input("start, a-f: ").strip().lower()
+    end = input("end, a-f: ").strip().lower()
+
+    if end == start:
+        print("Optimal path length:", 0)
+        return
+
+    que = Queue()
+    que.enqueue(start)
+
+    parent = {}  # Store parent nodes
+    path_length = {}  # Store path lengths
+
+    while not que.is_empty():
+        current_node = que.front()
+        if current_node == end:
+            print("Found! Optimal path length:", path_length[current_node])
+            # Print the path
+            path = []
+            while current_node != start:
+                path.append(current_node)
+                current_node = parent[current_node]
+            path.append(start)
+            print("Optimal path:", " -> ".join(path[::-1]))
+            return
+
+        if current_node not in parent:
+            parent[current_node] = current_node
+            path_length[current_node] = 0
+
+        neighbors = graph.get(current_node, [])
+        for neighbor in neighbors:
+            if neighbor not in parent:
+                parent[neighbor] = current_node
+                path_length[neighbor] = path_length[current_node] + 1
+                que.enqueue(neighbor)
+
+        que.dequeue()
+    print("path is impossible")
+    return 
+
+if __name__ == '__main__':
+    main()
